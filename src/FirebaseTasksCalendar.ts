@@ -8,39 +8,58 @@ import {
   doc,
   setDoc,
   deleteDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import Task from "./Task";
 import TasksCalendar from "./TasksCalendar";
 import { taskConverter } from "./utils/taskConverter";
 
-class FirebaseTasksCalendar extends TasksCalendar {
+export default class FirebaseTasksCalendar extends TasksCalendar {
   private app;
+
   private db;
+
   private collectionName;
 
-  constructor(firebaseConfig: Object, collectionName: string) {
+  constructor(firebaseConfig: Record<string, unknown>, collectionName: string) {
     super();
     this.app = initializeApp(firebaseConfig);
     this.db = getFirestore();
-    this.collectionName = "tasks";
+    this.collectionName = collectionName;
   }
 
   async getAll(): Promise<Task[]> {
-    const ref = collection(this.db, this.collectionName).withConverter(taskConverter);
+    const ref = collection(this.db, this.collectionName).withConverter(
+      taskConverter
+    );
     const querySnapshot = await getDocs(ref);
     const tasks: Task[] = [];
-    querySnapshot.forEach((doc) => tasks.push(doc.data()));
+    querySnapshot.forEach((document) => tasks.push(document.data()));
+    return tasks;
+  }
+
+  async getAllWithFilter(option: Partial<Task>): Promise<Task[]> {
+    const filters = Object.entries(option).map(([property, value]) => where(property, "==", value));
+    const request = query(
+      collection(this.db, this.collectionName).withConverter(taskConverter),
+      ...filters
+    );
+    const querySnapshot = await getDocs(request);
+    const tasks: Task[] = [];
+    querySnapshot.forEach((document) => tasks.push(document.data()));
     return tasks;
   }
 
   async getById(id: number): Promise<Task | null> {
-    const ref = doc(this.db, this.collectionName, String(id)).withConverter(taskConverter);
+    const ref = doc(this.db, this.collectionName, String(id)).withConverter(
+      taskConverter
+    );
     const docSnap = await getDoc(ref);
-    if(docSnap.exists()) {
+    if (docSnap.exists()) {
       return docSnap.data();
-    } else {
-      return null;
     }
+    return null;
   }
 
   async create(task: Task): Promise<boolean> {
@@ -67,6 +86,7 @@ class FirebaseTasksCalendar extends TasksCalendar {
       return false;
     }
   }
+  
   async delete(id: number): Promise<boolean> {
     try {
       await deleteDoc(doc(this.db, this.collectionName, String(id)));

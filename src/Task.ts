@@ -1,11 +1,29 @@
+type TaskOptions = {
+  id?: number;
+  name: string;
+  createdDate: number;
+  eventDate: number;
+  category: string;
+  tags: string[];
+  state: string;
+  description: string;
+}
+
 export default class Task {
   readonly id: number; // task id
+
   public name: string; // name of task
+
   public createdDate: number; // when the task was created
+
   public eventDate: number; // when task is set to be due, in milliseconds
+
   public category: string;
+
   public tags: string[];
+
   public state: string;
+
   public description: string;
 
   constructor(options: TaskOptions) {
@@ -19,15 +37,4 @@ export default class Task {
     this.state = state;
     this.description = description;
   }
-}
-
-type TaskOptions = {
-  id?: number;
-  name: string;
-  createdDate: number;
-  eventDate: number;
-  category: string;
-  tags: string[];
-  state: string;
-  description: string;
 }

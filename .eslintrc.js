@@ -26,6 +26,10 @@ module.exports = {
     "import/no-unresolved": "off",
     "import/extensions": ["warn", "never"],
     "import/prefer-default-export": "off",
+    "class-methods-use-this": [
+      "error",
+      { exceptMethods: ["getAll", "getById", "create", "update", "delete"] },
+    ],
     "max-len": [
       "error",
       {

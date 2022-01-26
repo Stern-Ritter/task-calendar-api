@@ -1,8 +1,9 @@
 import Task from "./Task";
 import TasksCalendar from "./TasksCalendar";
 
-class LocalStorageTasksCalendar extends TasksCalendar {
+export default class LocalStorageTasksCalendar extends TasksCalendar {
   private storageKey: string;
+
   private counter: number;
 
   constructor(storageKey = "calendar-data") {
@@ -15,28 +16,30 @@ class LocalStorageTasksCalendar extends TasksCalendar {
     return JSON.parse(localStorage.getItem(this.storageKey) || "[]");
   }
 
+  async getAllWithFilter(option: Partial<Task>): Promise<Task[]> {
+    const tasksState = await this.getAll();
+    return tasksState.filter((task) =>
+      Object.entries(option).every(([key, value]) => task[key] === value));
+  }
+
   async getById(id: number): Promise<Task | null> {
     const tasksState = await this.getAll();
     const existedTask = tasksState.find(
       (taskInstance) => taskInstance.id === id
     );
-    if (typeof existedTask !== "undefined") {
-      return existedTask;
-    } else {
-      return null;
-    }
+    return typeof existedTask !== "undefined" ? existedTask : null;
   }
 
   async create(task: Task): Promise<boolean> {
     const tasksState = await this.getAll();
     const tasksId = tasksState.map((taskInstance) => taskInstance.id);
     if (!tasksId.includes(task.id)) {
-      const newTasksState = [...tasksState, { ...task, id: ++this.counter }];
+      this.counter += 1;
+      const newTasksState = [...tasksState, { ...task, id: this.counter }];
       localStorage.setItem(this.storageKey, JSON.stringify(newTasksState));
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   async update(task: Task): Promise<boolean> {
@@ -48,9 +51,8 @@ class LocalStorageTasksCalendar extends TasksCalendar {
         .map((taskInstance) => taskInstance.id === task.id ? task : taskInstance);
       localStorage.setItem(this.storageKey,JSON.stringify(newTasksState));
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   async delete(id: number): Promise<boolean> {
@@ -61,8 +63,7 @@ class LocalStorageTasksCalendar extends TasksCalendar {
       const newTasksState = [...tasksState].filter((taskInstance) => taskInstance.id !== id);
       localStorage.setItem(this.storageKey,JSON.stringify(newTasksState));
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 }

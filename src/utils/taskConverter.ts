@@ -1,8 +1,7 @@
 import Task from "../Task";
 
 const taskConverter = {
-  toFirestore: (task: Task) => {
-    return {
+  toFirestore: (task: Task) => ({
       name: task.name,
       createdDate: task.createdDate,
       eventDate: task.eventDate,
@@ -10,8 +9,8 @@ const taskConverter = {
       tags: task.tags,
       state: task.state,
       description: task.description
-    };
-  },
+    }
+  ),
   fromFirestore: (snapshot: any, options: any) => {
     const data = snapshot.data(options);
     return new Task({
