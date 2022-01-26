@@ -56,5 +56,8 @@
   "lint-staged": {
     "*.js": "eslint --cache --fix",
     "*.{js,css,md,yml}": "prettier --write"
+  },
+  "dependencies": {
+    "firebase": "^9.4.1"
   }
 }
