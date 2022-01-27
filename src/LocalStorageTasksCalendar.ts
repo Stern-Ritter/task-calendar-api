@@ -1,4 +1,4 @@
-import Task from "./Task";
+import { Task } from "./Task";
 import TasksCalendar from "./TasksCalendar";
 
 export default class LocalStorageTasksCalendar extends TasksCalendar {
@@ -19,8 +19,12 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
   async getAllWithFilter(option: Partial<Task>): Promise<Task[]> {
     const tasksState = await this.getAll();
     const filters = Object.entries(option);
-    //@ts-ignore
-    return tasksState.filter((taskInstance) => filters.every(([key, value]) => taskInstance[key] === value));
+    return tasksState.filter((taskInstance) => filters.every(([key, value]) => {
+      if(Array.isArray(value)) {
+        return value.every((el) => taskInstance[key].includes(el));
+      }
+      return taskInstance[key] === value;
+    }));
   }
 
   async getById(id: number): Promise<Task | null> {

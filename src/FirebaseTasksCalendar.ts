@@ -11,7 +11,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import Task from "./Task";
+import { Task } from "./Task";
 import TasksCalendar from "./TasksCalendar";
 import { taskConverter } from "./utils/taskConverter";
 
@@ -86,7 +86,7 @@ export default class FirebaseTasksCalendar extends TasksCalendar {
       return false;
     }
   }
-  
+
   async delete(id: number): Promise<boolean> {
     try {
       await deleteDoc(doc(this.db, this.collectionName, String(id)));

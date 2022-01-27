@@ -1,4 +1,4 @@
-import Task from "./Task";
+import { Task } from "./Task";
 
 export default abstract class TasksCalendar {
   abstract getAll(): any;
@@ -8,6 +8,6 @@ export default abstract class TasksCalendar {
   abstract create(task: Task): any;
 
   abstract update(task: Task): any;
-  
+
   abstract delete(id: number): any;
 }

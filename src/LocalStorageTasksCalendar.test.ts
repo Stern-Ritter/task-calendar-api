@@ -58,6 +58,66 @@ describe("LocalStorageTasksCalendar", () => {
     expect(tasks).toEqual(expectedTasks);
   });
 
+  it("method getAllWithFilter() return correct value", async () => {
+    const elements: TaskOptions[] = [
+      {
+        name: "first task",
+        createdDate: 1643273967854,
+        eventDate: 1643274544153,
+        category: "first category",
+        tags: ["first", "second"],
+        state: "to do",
+        description: "first description",
+      },
+      {
+        name: "second task",
+        createdDate: 1643273967860,
+        eventDate: 1643274544163,
+        category: "second category",
+        tags: ["second", "third"],
+        state: "done",
+        description: "second description",
+      },
+      {
+        name: "third task",
+        createdDate: 1643273967854,
+        eventDate: 1643274544163,
+        category: "first category",
+        tags: ["third"],
+        state: "done",
+        description: "third description",
+      }
+    ];
+
+    for(const element of elements) {
+      const taskObj = new Task({ ...element });
+      const done = await storage.create(taskObj);
+      expect(done).toBeTruthy();
+    }
+
+    let tasks = await storage.getAllWithFilter({tags: ["second"]});
+    expect(tasks).toHaveLength(2);
+    expect(tasks).toContainEqual({...elements[0], id: 1});
+    expect(tasks).toContainEqual({...elements[1], id: 2});
+    expect(tasks).not.toContainEqual({...elements[2], id: 3});
+
+    tasks = await storage.getAllWithFilter({description: "second description"});
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0]).toEqual({...elements[1], id: 2});
+
+    tasks = await storage.getAllWithFilter({createdDate: 1643273967854});
+    expect(tasks).toHaveLength(2);
+    expect(tasks).toContainEqual({...elements[0], id: 1});
+    expect(tasks).not.toContainEqual({...elements[1], id: 2});
+    expect(tasks).toContainEqual({...elements[2], id: 3});
+
+    tasks = await storage.getAllWithFilter({state: "done"});
+    expect(tasks).toHaveLength(2);
+    expect(tasks).not.toContainEqual({...elements[0], id: 1});
+    expect(tasks).toContainEqual({...elements[1], id: 2});
+    expect(tasks).toContainEqual({...elements[2], id: 3});
+  });
+
   it(`method getById() return null if
   task with this id does not exist`, async () => {
     const task = await storage.getById(1);
