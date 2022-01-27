@@ -18,8 +18,9 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
 
   async getAllWithFilter(option: Partial<Task>): Promise<Task[]> {
     const tasksState = await this.getAll();
-    return tasksState.filter((task) =>
-      Object.entries(option).every(([key, value]) => task[key] === value));
+    const filters = Object.entries(option);
+    //@ts-ignore
+    return tasksState.filter((taskInstance) => filters.every(([key, value]) => taskInstance[key] === value));
   }
 
   async getById(id: number): Promise<Task | null> {

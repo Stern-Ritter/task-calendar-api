@@ -1,3 +1,10 @@
+const taskStates = [
+  "to do",
+  "done",
+] as const;
+
+type TaskState = typeof taskStates[number];
+
 type TaskOptions = {
   id?: number;
   name: string;
@@ -5,11 +12,11 @@ type TaskOptions = {
   eventDate: number;
   category: string;
   tags: string[];
-  state: string;
+  state: TaskState;
   description: string;
 }
 
-export default class Task {
+class Task {
   readonly id: number; // task id
 
   public name: string; // name of task
@@ -38,3 +45,5 @@ export default class Task {
     this.description = description;
   }
 }
+
+export { Task, TaskOptions, taskStates};
