@@ -17,13 +17,12 @@ type TaskOptions = {
 }
 
 class Task {
-  readonly id: string; // task id
+  readonly id: string;
+  public name: string;
 
-  public name: string; // name of task
+  public createdDate: number;
 
-  public createdDate: number; // when the task was created
-
-  public eventDate: number; // when task is set to be due, in milliseconds
+  public eventDate: number;
 
   public category: string;
 
