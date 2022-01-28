@@ -3,7 +3,6 @@ import TasksCalendar from "./TasksCalendar";
 
 export default class LocalStorageTasksCalendar extends TasksCalendar {
   private storageKey: string;
-
   private counter: number;
 
   constructor(storageKey = "calendar-data") {
@@ -18,7 +17,7 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
 
   async getAllWithFilter(option: Partial<Task>): Promise<Task[]> {
     const tasksState = await this.getAll();
-    const filters = Object.entries(option) as [keyof Partial<Task>, any][];
+    const filters = Object.entries(option) as [keyof Task, any][];
     return tasksState.filter((taskInstance) =>
     filters.every(([filter, filterValue]) => {
       const originValue = taskInstance[filter];
