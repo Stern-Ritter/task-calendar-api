@@ -19,17 +19,11 @@ type TaskOptions = {
 class Task {
   readonly id: string;
   public name: string;
-
   public createdDate: number;
-
   public eventDate: number;
-
   public category: string;
-
   public tags: string[];
-
   public state: string;
-
   public description: string;
 
   constructor(options: TaskOptions) {
@@ -45,4 +39,4 @@ class Task {
   }
 }
 
-export { Task, TaskOptions, taskStates};
+export { Task, TaskOptions};
