@@ -26,6 +26,13 @@ module.exports = {
     "import/no-unresolved": "off",
     "import/extensions": ["warn", "never"],
     "import/prefer-default-export": "off",
+    "no-await-in-loop": "off",
+    "no-restricted-syntax": [
+      "error",
+      "ForInStatement",
+      "LabeledStatement",
+      "WithStatement",
+    ],
     "class-methods-use-this": [
       "error",
       { exceptMethods: ["getAll", "getById", "create", "update", "delete"] },

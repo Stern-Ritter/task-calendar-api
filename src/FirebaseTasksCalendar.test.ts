@@ -1,19 +1,23 @@
-import LocalStorageTasksCalendar from "./LocalStorageTasksCalendar";
+import FirebaseTasksCalendar from "./FirebaseTasksCalendar";
 import { Task, TaskOptions } from "./Task";
-import { storageKey } from "./utils/config";
+import { firebaseConfig } from "./utils/config";
 
-let storage: LocalStorageTasksCalendar;
+let storage: FirebaseTasksCalendar;
+const collectionName = "calendar-tasks";
 
 describe("LocalStorageTasksCalendar", () => {
-  beforeEach(() => {
-    localStorage.removeItem(storageKey);
-    storage = new LocalStorageTasksCalendar(storageKey);
+  beforeAll(() => {
+    storage = new FirebaseTasksCalendar(firebaseConfig, collectionName);
+  })
+
+  beforeEach(async () => {
+    await storage.deleteAll();
   });
 
   it(`method getAll() return empty array if
   method create() has never been called yet`, async () => {
     const tasks = await storage.getAll();
-    expect(tasks).toEqual([]);
+    expect(tasks).toStrictEqual([]);
   });
 
   it(`method getAll() return correct values`, async () => {
@@ -47,15 +51,18 @@ describe("LocalStorageTasksCalendar", () => {
       }
     ];
 
-    for(const element of elements) {
+    const operations: Promise<string>[] = [];
+    elements.forEach((element) => {
       const taskObj = new Task({ ...element });
-      const id = await storage.create(taskObj);
-      expect(id).not.toBeNull();
-    }
+      operations.push(storage.create(taskObj) as Promise<string>);
+    });
+    const results = await Promise.all(operations);
+    results.forEach((id, idx) => { elements[idx].id = id });
 
     const tasks = await storage.getAll();
-    const expectedTasks = elements.map((element, idx) => ({...element, id: String(idx + 1)}));
-    expect(tasks).toEqual(expectedTasks);
+    elements.forEach((expectedTask) => {
+        expect(tasks).toContainEqual(expectedTask);
+      });
   });
 
   it("method getAllWithFilter() return correct value", async () => {
@@ -89,33 +96,36 @@ describe("LocalStorageTasksCalendar", () => {
       }
     ];
 
-    for(const element of elements) {
+    const operations: Promise<string>[] = [];
+    elements.forEach((element) => {
       const taskObj = new Task({ ...element });
-      const id = await storage.create(taskObj);
-      expect(id).not.toBeNull();
-    }
+      operations.push(storage.create(taskObj) as Promise<string>);
+    });
+    const results = await Promise.all(operations);
+    results.forEach((id, idx) => { elements[idx].id = id });
 
-    let tasks = await storage.getAllWithFilter({tags: ["second"]});
-    expect(tasks).toHaveLength(2);
-    expect(tasks).toContainEqual({...elements[0], id: "1"});
-    expect(tasks).toContainEqual({...elements[1], id: "2"});
-    expect(tasks).not.toContainEqual({...elements[2], id: "3"});
-
-    tasks = await storage.getAllWithFilter({description: "second description"});
+    let tasks = await storage.getAllWithFilter({description: "second description"});
     expect(tasks).toHaveLength(1);
-    expect(tasks[0]).toEqual({...elements[1], id: "2"});
+    expect(tasks[0]).toEqual({...elements[1]});
 
     tasks = await storage.getAllWithFilter({createdDate: 1643273967854});
     expect(tasks).toHaveLength(2);
-    expect(tasks).toContainEqual({...elements[0], id: "1"});
-    expect(tasks).not.toContainEqual({...elements[1], id: "2"});
-    expect(tasks).toContainEqual({...elements[2], id: "3"});
+    expect(tasks).toContainEqual({...elements[0]});
+    expect(tasks).not.toContainEqual({...elements[1]});
+    expect(tasks).toContainEqual({...elements[2]});
 
     tasks = await storage.getAllWithFilter({state: "done"});
     expect(tasks).toHaveLength(2);
-    expect(tasks).not.toContainEqual({...elements[0], id: "1"});
-    expect(tasks).toContainEqual({...elements[1], id: "2"});
-    expect(tasks).toContainEqual({...elements[2], id: "3"});
+    expect(tasks).not.toContainEqual({...elements[0]});
+    expect(tasks).toContainEqual({...elements[1]});
+    expect(tasks).toContainEqual({...elements[2]});
+
+    tasks = await storage.getAllWithFilter({tags: ["second"]});
+    expect(tasks).toHaveLength(2);
+    expect(tasks).toContainEqual({...elements[0]});
+    expect(tasks).toContainEqual({...elements[1]});
+    expect(tasks).not.toContainEqual({...elements[2]});
+
   });
 
   it(`method getById() return null if
@@ -136,10 +146,10 @@ describe("LocalStorageTasksCalendar", () => {
       description: "first description",
     };
     const taskObj = new Task({ ...element });
-    const id = await storage.create(taskObj);
-    const task = await storage.getById("1");
-    expect(id).not.toBeNull();
-    expect(task).toEqual({ ...element, id: "1" });
+    const id = await storage.create(taskObj) as string;
+    element.id = id;
+    const task = await storage.getById(id);
+    expect(task).toEqual({ ...element});
   });
 
   it("method update() updates task correctly", async() => {
@@ -163,12 +173,15 @@ describe("LocalStorageTasksCalendar", () => {
         description: "second description",
       }];
 
-      for(const element of elements) {
+      const operations: Promise<string>[] = [];
+      elements.forEach((element) => {
         const taskObj = new Task({ ...element });
-        await storage.create(taskObj);
-      }
+        operations.push(storage.create(taskObj) as Promise<string>);
+      });
+      const results = await Promise.all(operations);
+      results.forEach((id, idx) => { elements[idx].id = id });
 
-      const firstTask = await storage.getById("1") as Task;
+      const firstTask = await storage.getById(elements[0].id as string) as Task;
       const expectedTask = {
         ...firstTask,
         name: "new task",
@@ -177,12 +190,12 @@ describe("LocalStorageTasksCalendar", () => {
         description: "new description"
       }
 
-      const id = await storage.update(expectedTask);
-      const updatedFirstTask = await storage.getById("1");
-      const secondTask = await storage.getById("2");
-      expect(id).not.toBeNull();
+      const done = await storage.update(expectedTask);
+      const updatedFirstTask = await storage.getById(elements[0].id as string);
+      const secondTask = await storage.getById(elements[1].id as string);
+      expect(done).toBeTruthy();
       expect(updatedFirstTask).toEqual(expectedTask);
-      expect(secondTask).toEqual({...elements[1], id: "2"});
+      expect(secondTask).toEqual({...elements[1]});
   });
 
   it("method delete() deletes task correctly", async() => {
@@ -206,15 +219,18 @@ describe("LocalStorageTasksCalendar", () => {
         description: "second description",
       }];
 
-      for(const element of elements) {
+      const operations: Promise<string>[] = [];
+      elements.forEach((element) => {
         const taskObj = new Task({ ...element });
-        await storage.create(taskObj);
-      }
+        operations.push(storage.create(taskObj) as Promise<string>);
+      });
+      const results = await Promise.all(operations);
+      results.forEach((id, idx) => { elements[idx].id = id });
 
-      const id = await storage.delete("1");
+      const done = await storage.delete(elements[0].id as string);
       const tasks = await storage.getAll();
-      expect(id).not.toBeNull();
-      expect(tasks).not.toContainEqual({...elements[0], id: "1"});
-      expect(tasks).toContainEqual({...elements[1], id: "2"});
+      expect(done).toBeTruthy();
+      expect(tasks).not.toContainEqual({...elements[0]});
+      expect(tasks).toContainEqual({...elements[1]});
   });
 });

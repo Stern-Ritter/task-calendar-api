@@ -27,7 +27,7 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
     }));
   }
 
-  async getById(id: number): Promise<Task | null> {
+  async getById(id: string): Promise<Task | null> {
     const tasksState = await this.getAll();
     const existedTask = tasksState.find(
       (taskInstance) => taskInstance.id === id
@@ -35,16 +35,16 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
     return typeof existedTask !== "undefined" ? existedTask : null;
   }
 
-  async create(task: Task): Promise<boolean> {
+  async create(task: Task): Promise<string | null> {
     const tasksState = await this.getAll();
     const tasksId = tasksState.map((taskInstance) => taskInstance.id);
     if (!tasksId.includes(task.id)) {
       this.counter += 1;
-      const newTasksState = [...tasksState, { ...task, id: this.counter }];
+      const newTasksState = [...tasksState, { ...task, id: String(this.counter) }];
       localStorage.setItem(this.storageKey, JSON.stringify(newTasksState));
-      return true;
+      return String(this.counter);
     }
-    return false;
+    return null;
   }
 
   async update(task: Task): Promise<boolean> {
@@ -60,7 +60,7 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
     return false;
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: string): Promise<boolean> {
     const tasksState = await this.getAll();
     const existedTask = tasksState
       .find((taskInstance) => taskInstance.id === id);

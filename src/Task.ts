@@ -6,7 +6,7 @@ const taskStates = [
 type TaskState = typeof taskStates[number];
 
 type TaskOptions = {
-  id?: number;
+  id?: string;
   name: string;
   createdDate: number;
   eventDate: number;
@@ -17,7 +17,7 @@ type TaskOptions = {
 }
 
 class Task {
-  readonly id: number; // task id
+  readonly id: string; // task id
 
   public name: string; // name of task
 
@@ -35,7 +35,7 @@ class Task {
 
   constructor(options: TaskOptions) {
     const { id, name, createdDate, eventDate, category, tags, state, description } = options;
-    this.id = typeof id !== 'undefined' ? id : -1;
+    this.id = typeof id !== 'undefined' ? id : "";
     this.name = name;
     this.createdDate = createdDate;
     this.eventDate = eventDate;

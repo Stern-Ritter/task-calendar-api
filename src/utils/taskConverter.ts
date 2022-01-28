@@ -9,8 +9,7 @@ const taskConverter = {
       tags: task.tags,
       state: task.state,
       description: task.description
-    }
-  ),
+    }),
   fromFirestore: (snapshot: any, options: any) => {
     const data = snapshot.data(options);
     return new Task({
