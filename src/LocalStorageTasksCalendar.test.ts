@@ -5,9 +5,9 @@ import { storageKey } from "./utils/config";
 let storage: LocalStorageTasksCalendar;
 
 describe("LocalStorageTasksCalendar", () => {
-  beforeEach(() => {
-    localStorage.removeItem(storageKey);
+  beforeEach(async() => {
     storage = new LocalStorageTasksCalendar(storageKey);
+    await storage.deleteAll();
   });
 
   it(`method getAll() return empty array if

@@ -72,4 +72,9 @@ export default class LocalStorageTasksCalendar extends TasksCalendar {
     }
     return false;
   }
+
+  async deleteAll(): Promise<boolean> {
+    localStorage.removeItem(this.storageKey);
+    return true;
+  }
 }
