@@ -177,10 +177,10 @@ describe("LocalStorageTasksCalendar", () => {
         description: "new description"
       }
 
-      const id = await storage.update(expectedTask);
+      const done = await storage.update(expectedTask);
       const updatedFirstTask = await storage.getById("1");
       const secondTask = await storage.getById("2");
-      expect(id).not.toBeNull();
+      expect(done).toBeTruthy();
       expect(updatedFirstTask).toEqual(expectedTask);
       expect(secondTask).toEqual({...elements[1], id: "2"});
   });
@@ -211,9 +211,9 @@ describe("LocalStorageTasksCalendar", () => {
         await storage.create(taskObj);
       }
 
-      const id = await storage.delete("1");
+      const done = await storage.delete("1");
       const tasks = await storage.getAll();
-      expect(id).not.toBeNull();
+      expect(done).toBeTruthy();
       expect(tasks).not.toContainEqual({...elements[0], id: "1"});
       expect(tasks).toContainEqual({...elements[1], id: "2"});
   });
