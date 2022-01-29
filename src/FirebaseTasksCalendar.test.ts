@@ -53,7 +53,7 @@ describe("LocalStorageTasksCalendar", () => {
 
     const operations: Promise<string>[] = [];
     elements.forEach((element) => {
-      const taskObj = new Task({ ...element });
+      const taskObj = new Task(element);
       operations.push(storage.create(taskObj) as Promise<string>);
     });
     const results = await Promise.all(operations);
@@ -98,7 +98,7 @@ describe("LocalStorageTasksCalendar", () => {
 
     const operations: Promise<string>[] = [];
     elements.forEach((element) => {
-      const taskObj = new Task({ ...element });
+      const taskObj = new Task(element);
       operations.push(storage.create(taskObj) as Promise<string>);
     });
     const results = await Promise.all(operations);
@@ -106,25 +106,25 @@ describe("LocalStorageTasksCalendar", () => {
 
     let tasks = await storage.getAllWithFilter({description: "second description"});
     expect(tasks).toHaveLength(1);
-    expect(tasks[0]).toEqual({...elements[1]});
+    expect(tasks[0]).toEqual(elements[1]);
 
     tasks = await storage.getAllWithFilter({createdDate: 1643273967854});
     expect(tasks).toHaveLength(2);
-    expect(tasks).toContainEqual({...elements[0]});
-    expect(tasks).not.toContainEqual({...elements[1]});
-    expect(tasks).toContainEqual({...elements[2]});
+    expect(tasks).toContainEqual(elements[0]);
+    expect(tasks).not.toContainEqual(elements[1]);
+    expect(tasks).toContainEqual(elements[2]);
 
     tasks = await storage.getAllWithFilter({state: "done"});
     expect(tasks).toHaveLength(2);
-    expect(tasks).not.toContainEqual({...elements[0]});
-    expect(tasks).toContainEqual({...elements[1]});
-    expect(tasks).toContainEqual({...elements[2]});
+    expect(tasks).not.toContainEqual(elements[0]);
+    expect(tasks).toContainEqual(elements[1]);
+    expect(tasks).toContainEqual(elements[2]);
 
     tasks = await storage.getAllWithFilter({tags: ["second"]});
     expect(tasks).toHaveLength(2);
-    expect(tasks).toContainEqual({...elements[0]});
-    expect(tasks).toContainEqual({...elements[1]});
-    expect(tasks).not.toContainEqual({...elements[2]});
+    expect(tasks).toContainEqual(elements[0]);
+    expect(tasks).toContainEqual(elements[1]);
+    expect(tasks).not.toContainEqual(elements[2]);
 
   });
 
@@ -145,11 +145,11 @@ describe("LocalStorageTasksCalendar", () => {
       state: "to do",
       description: "first description",
     };
-    const taskObj = new Task({ ...element });
+    const taskObj = new Task(element);
     const id = await storage.create(taskObj) as string;
     element.id = id;
     const task = await storage.getById(id);
-    expect(task).toEqual({ ...element});
+    expect(task).toEqual(element);
   });
 
   it("method update() updates task correctly", async() => {
@@ -175,7 +175,7 @@ describe("LocalStorageTasksCalendar", () => {
 
       const operations: Promise<string>[] = [];
       elements.forEach((element) => {
-        const taskObj = new Task({ ...element });
+        const taskObj = new Task(element);
         operations.push(storage.create(taskObj) as Promise<string>);
       });
       const results = await Promise.all(operations);
@@ -195,7 +195,7 @@ describe("LocalStorageTasksCalendar", () => {
       const secondTask = await storage.getById(elements[1].id as string);
       expect(done).toBeTruthy();
       expect(updatedFirstTask).toEqual(expectedTask);
-      expect(secondTask).toEqual({...elements[1]});
+      expect(secondTask).toEqual(elements[1]);
   });
 
   it("method delete() deletes task correctly", async() => {
@@ -221,7 +221,7 @@ describe("LocalStorageTasksCalendar", () => {
 
       const operations: Promise<string>[] = [];
       elements.forEach((element) => {
-        const taskObj = new Task({ ...element });
+        const taskObj = new Task(element);
         operations.push(storage.create(taskObj) as Promise<string>);
       });
       const results = await Promise.all(operations);
@@ -230,7 +230,7 @@ describe("LocalStorageTasksCalendar", () => {
       const done = await storage.delete(elements[0].id as string);
       const tasks = await storage.getAll();
       expect(done).toBeTruthy();
-      expect(tasks).not.toContainEqual({...elements[0]});
-      expect(tasks).toContainEqual({...elements[1]});
+      expect(tasks).not.toContainEqual(elements[0]);
+      expect(tasks).toContainEqual(elements[1]);
   });
 });
