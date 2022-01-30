@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, deleteApp } from "firebase/app";
 import {
   getFirestore,
   collection,
@@ -42,40 +42,47 @@ export default class FirebaseTasksCalendar extends TasksCalendar {
     }
   }
 
-  async getAllWithFilter(option: Partial<Task>): Promise<Task[]> {
-    const filters = Object.entries(option)
-    .map(([filter, filterValue]) => {
-      if(Array.isArray(filterValue)) {
-        return filterValue.map((value) => where(filter, "array-contains", value))
+  async getAllWithFilter(option: Partial<Task>): Promise<Task[] | null> {
+    try {
+      const filters = Object.entries(option)
+      .map(([filter, filterValue]) => {
+        if(Array.isArray(filterValue)) {
+          return filterValue.map((value) => where(filter, "array-contains", value))
+        }
+        return where(filter, "==", filterValue)
+      })
+      .flat();
+      const ref = query(
+        collection(this.db, this.collectionName).withConverter(taskConverter),
+        ...filters
+        );
+        const querySnapshot = await getDocs(ref);
+        const tasks: Task[] = [];
+        querySnapshot.forEach((document) => tasks.push(document.data()));
+        console.log("Documents received");
+        return tasks;
+      } catch(err) {
+        console.log("Error receiving documents: ", err);
+        return null;
       }
-      return where(filter, "==", filterValue)
-    })
-    .flat();
-    const ref = query(
-      collection(this.db, this.collectionName).withConverter(taskConverter),
-      ...filters
-    );
-    const querySnapshot = await getDocs(ref);
-    const tasks: Task[] = [];
-    querySnapshot.forEach((document) => tasks.push(document.data()));
-    return tasks;
-  }
+    }
 
   async getById(id: string): Promise<Task | null> {
-    const ref = doc(this.db, this.collectionName, String(id)).withConverter(
-      taskConverter
-    );
-    const querySnapshot = await getDoc(ref);
-    if (querySnapshot.exists()) {
-      return querySnapshot.data();
+    try {
+      const ref = doc(this.db, this.collectionName, String(id)).withConverter(taskConverter);
+      const querySnapshot = await getDoc(ref);
+      console.log("Received a document with ID: ", querySnapshot.id);
+      return querySnapshot.exists() ? querySnapshot.data() : null;
+    } catch (err) {
+      console.log("Error receiving document: ", err);
+      return null;
     }
-    return null;
   }
 
   async create(task: Task): Promise<string | null> {
     try {
       const ref = collection(this.db, this.collectionName).withConverter(taskConverter);
-      const querySnapshot = await addDoc(ref,task);
+      const querySnapshot = await addDoc(ref, task);
       console.log("Document written with ID: ", querySnapshot.id);
       return querySnapshot.id;
     } catch (err) {
@@ -118,6 +125,15 @@ export default class FirebaseTasksCalendar extends TasksCalendar {
     } catch (err) {
       console.log("Error deleting all documents: ", err);
       return false;
+    }
+  }
+
+  async close(): Promise<void> {
+    try {
+      deleteApp(this.app);
+      console.log("App deleted successfully");
+    } catch(err) {
+      console.log("Error deleting app:", err);
     }
   }
 }

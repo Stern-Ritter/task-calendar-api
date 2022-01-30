@@ -8,7 +8,11 @@ const collectionName = "calendar-tasks";
 describe("LocalStorageTasksCalendar", () => {
   beforeAll(() => {
     storage = new FirebaseTasksCalendar(firebaseConfig, collectionName);
-  })
+  });
+
+  afterAll(async () => {
+    await storage.close();
+  });
 
   beforeEach(async () => {
     await storage.deleteAll();
