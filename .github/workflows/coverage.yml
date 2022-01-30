@@ -2,14 +2,17 @@ name: "coverage"
 on:
   pull_request:
     branches:
-      - master
       - main
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
       - uses: actions/checkout@v1
       - uses: ArtiomTr/jest-coverage-report-action@v2
-    with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-      threshold: 60
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          threshold: 60
