@@ -6,21 +6,13 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     steps:
-      - uses: actions/checkout@v2
-      - run: git fetch --prune --unshallow
-
-      - name: User Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - uses: actions/checkout@v1
-      - uses: artiomtr/jest-coverage-report-action@v2.0-rc.6
+          node-version: 14
+      - uses: actions/checkout@v2
+      - uses: artiomtr/jest-coverage-report-action@v2.0-rc.5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           threshold: 60
