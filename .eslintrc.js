@@ -38,10 +38,6 @@ module.exports = {
       "LabeledStatement",
       "WithStatement",
     ],
-    "class-methods-use-this": [
-      "error",
-      { exceptMethods: ["getAll", "getById", "create", "update", "delete"] },
-    ],
     "max-len": [
       "error",
       {
