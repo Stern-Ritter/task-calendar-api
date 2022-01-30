@@ -108,23 +108,23 @@ describe("LocalStorageTasksCalendar", () => {
     const results = await Promise.all(operations);
     results.forEach((id, idx) => { elements[idx].id = id });
 
-    let tasks = await storage.getAllWithFilter({description: "second description"});
+    let tasks = await storage.getAllWithFilter({description: "second description"}) as Task[];
     expect(tasks).toHaveLength(1);
     expect(tasks[0]).toEqual(elements[1]);
 
-    tasks = await storage.getAllWithFilter({createdDate: 1643273967854});
+    tasks = await storage.getAllWithFilter({createdDate: 1643273967854}) as Task[];
     expect(tasks).toHaveLength(2);
     expect(tasks).toContainEqual(elements[0]);
     expect(tasks).not.toContainEqual(elements[1]);
     expect(tasks).toContainEqual(elements[2]);
 
-    tasks = await storage.getAllWithFilter({state: "done"});
+    tasks = await storage.getAllWithFilter({state: "done"}) as Task[];
     expect(tasks).toHaveLength(2);
     expect(tasks).not.toContainEqual(elements[0]);
     expect(tasks).toContainEqual(elements[1]);
     expect(tasks).toContainEqual(elements[2]);
 
-    tasks = await storage.getAllWithFilter({tags: ["second"]});
+    tasks = await storage.getAllWithFilter({tags: ["second"]}) as Task[];
     expect(tasks).toHaveLength(2);
     expect(tasks).toContainEqual(elements[0]);
     expect(tasks).toContainEqual(elements[1]);
