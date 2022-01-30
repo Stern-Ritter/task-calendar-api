@@ -1,3 +1,7 @@
+/**
+ * @jest-environment node
+ */
+
 import FirebaseTasksCalendar from "./FirebaseTasksCalendar";
 import { Task, TaskOptions } from "./Task";
 import { firebaseConfig } from "./utils/config";

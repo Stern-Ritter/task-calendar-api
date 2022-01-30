@@ -4,7 +4,7 @@
   "description": "Task calendar api",
   "main": "index.js",
   "scripts": {
-    "test": "jest --forceExit",
+    "test": "jest",
     "build": "webpack build --node-env production",
     "dev": "webpack serve --open",
     "lint": "eslint . --ext .js,.ts && tsc --noEmit",
