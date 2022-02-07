@@ -2,7 +2,6 @@
 
 ## Описание проекта
 
-![Jest coverage workflow](https://github.com/Stern-Ritter/task-calendar-api/actions/workflows/coverage.yml/badge.svg)
 ![Sanity check workflow](https://github.com/Stern-Ritter/task-calendar-api/actions/workflows/sanity-check.yml/badge.svg)
 
 ## Описание
